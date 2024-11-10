@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zfy24/11/06</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 10px;
+    }
+    .row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        font-size: 30px; /* 默认字体大小 */
+    }
+    .number {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+    .text {
+        cursor: pointer;
+        flex-grow: 1;
+        margin-right: 5px; /* 调整间距 */
+    }
+    .buttons-container {
+        display: flex;
+        align-items: center;
+    }
+    .copy-button {
+        margin-left: 0; /* 移除左边距 */
+        padding: 5px 10px;
+        font-size: inherit; /* 继承父元素字体大小 */
+        line-height: 1; /* 确保按钮内的文本垂直居中 */
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease; /* 平滑过渡效果 */
+    }
+    .copy-button.copied {
+        background-color: green;
+        color: white;
+    }
+    .text.copied {
+        color: green;
+    }
+    .mark-button {
+        margin-left: 5px;
+        padding: 5px 10px;
+        font-size: inherit; /* 继承父元素字体大小 */
+        line-height: 1; /* 确保按钮内的文本垂直居中 */
+        background-color: #f0f0f0;
+        color: #000;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease; /* 平滑过渡效果 */
+    }
+    .mark-button.marked {
+        background-color: rgba(0, 255, 8, 0.621);
+        color: white;
+    }
+    .controls {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .control-button {
+        padding: 5px 10px;
+        margin-right: 5px;
+    }
+    /* 响应式设计 */
+    @media (max-width: 600px) {
+        .row {
+            font-size: 20px; /* 手机上的字体大小 */
+        }
+        .number {
+            margin-right: 10px; /* 增大间距 */
+        }
+        .text {
+            margin-right: 10px; /* 增大间距 */
+        }
+    }
+</style>
+<script>
+let currentFontSize = 20; // 默认字体大小
+let currentCopiedRow = null;
+
+function adjustFontSize(increase) {
+    currentFontSize += increase;
+    currentFontSize = Math.max(12, Math.min(currentFontSize, 100)); // 限制字体大小在12到100之间
+    document.querySelectorAll('.row').forEach(row => {
+        row.style.fontSize = `${currentFontSize}px`;
+    });
+}
+
+async function copyText(textElement, button, number) {
+    try {
+        await navigator.clipboard.writeText(textElement.textContent);
+        button.textContent = `已复制 ${number}`;
+        button.classList.add('copied');
+        textElement.classList.add('copied');
+
+        if (currentCopiedRow) {
+            const prevButton = currentCopiedRow.querySelector('.copy-button');
+            const prevText = currentCopiedRow.querySelector('.text');
+            prevButton.textContent = `复制 ${prevText.parentNode.querySelector('.number').textContent}`;
+            prevButton.classList.remove('copied');
+            prevText.classList.remove('copied');
+        }
+
+        currentCopiedRow = textElement.closest('.row');
+
+        setTimeout(() => {
+            if (currentCopiedRow === textElement.closest('.row')) {
+                button.textContent = `复制 ${number}`;
+                button.classList.remove('copied');
+                textElement.classList.remove('copied');
+                currentCopiedRow = null;
+            }
+        }, 5000);
+    } catch (err) {
+        console.error('复制失败:', err);
+    }
+}
+
+function markRow(button) {
+    button.classList.toggle('marked');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('content');
+    const texts = [
+        "双十一来啦",
+        "购物盛宴惊喜连连",
+        "双十一全民嗨购",
+        "双十一惠战到底",
+        "购物狂欢等你来战",
+        "双十一大战在即",
+        "斗志燃烧吧",
+        "抢购一触即发",
+        "打赢双十一做三国英雄",
+        "双十一大家都准备好了吗",
+        "麻烦分享下双十一购物车",
+        "我已经买过一波了",
+        "今天不买明天会更便宜吗",
+        "说实话看这价格我有点忍不住",
+        "都说双十一也没那么便宜",
+        "我看上的东西价格都不错",
+        "总之先囤货",
+        "每年双十一都买好多",
+        "先买一年份的",
+        "用到明年双十一",
+        "明年接着抢购",
+        "嘘寒问暖不如打笔巨款",
+        "蓄力待发双十一我们来了",
+        "留着钱买新时装",
+        "每年都管不住手",
+        "可以买贵的不能买贵了",
+        "买到就是赚到",
+        "不买东西就觉得自己亏大了",
+        "双十一看看大家的尾款吧",
+        "理智消费",
+        "折扣多多福利多多",
+        "多多参与活动获得奖励",
+        "这一次我买的多了确实也变强了",
+        "果然一分价钱一分货",
+        "谁来给我买买买",
+        "好兄弟帮我付尾款",
+        "可别忘了还有双十二呢",
+        "这个月买爽了下个月怎么办",
+        "双十一不缺对象只缺钱",
+        "双十一别忘了给自己也买点东西",
+        "对自己好一点",
+        "祝大家都买到物美价廉的东西",
+        "今年双十一买到的最值的东西是什么",
+        "双十一给心爱的人也买一份礼物",
+        "双十一先送我一个心爱的人",
+        "有钱奈何没对象",
+        "明年不想过这个节了",
+        "祝你今年就脱单",
+        "双十一我要和貂蝉过",
+        "132"
+    ];
+
+    // 创建控制按钮
+    const controls = document.createElement('div');
+    controls.className = 'controls';
+
+    const increaseButton = document.createElement('button');
+    increaseButton.className = 'control-button';
+    increaseButton.textContent = '放大字体';
+    increaseButton.onclick = () => adjustFontSize(2);
+
+    const decreaseButton = document.createElement('button');
+    decreaseButton.className = 'control-button';
+    decreaseButton.textContent = '缩小字体';
+    decreaseButton.onclick = () => adjustFontSize(-2);
+
+    controls.appendChild(increaseButton);
+    controls.appendChild(decreaseButton);
+
+    container.appendChild(controls);
+
+    for (let i = 1; i <= 50; i++) {
+        const row = document.createElement('div');
+        row.className = 'row';
+        
+        const number = document.createElement('span');
+        number.className = 'number';
+        number.textContent = `${i}. `;
+
+        const text = document.createElement('span');
+        text.className = 'text';
+        text.textContent = texts[i - 1]; // 从第1行开始
+        text.onclick = () => copyText(text, button, number.textContent);
+
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.className = 'buttons-container';
+
+        const button = document.createElement('button');
+        button.className = 'copy-button';
+        button.textContent = `复制 ${number.textContent}`;
+        button.onclick = () => copyText(text, button, number.textContent);
+
+        const markButton = document.createElement('button');
+        markButton.className = 'mark-button';
+        markButton.innerHTML = '<i class="flag-icon">🚩</i>'; // 使用小旗子图标
+        markButton.onclick = () => markRow(markButton);
+        
+        buttonsContainer.appendChild(button);
+        buttonsContainer.appendChild(markButton);
+
+        row.appendChild(number);
+        row.appendChild(text);
+        row.appendChild(buttonsContainer);
+        
+        container.appendChild(row);
+    }
+});
+</script>
+</head>
+<body>
+<div id="content"></div>
+</body>
+</html>
